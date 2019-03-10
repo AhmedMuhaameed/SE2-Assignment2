@@ -24,3 +24,35 @@ class BlockChain:
         self.transactions=[]
         self.chain.append(block)
         return block
+
+    def addTransaction(self,sender:str,receiver:str,amount:int)->int:
+
+        newTransaction=Transaction(sender,receiver,amount)
+        self.transactions.append(newTransaction)
+        return self.lastBlock().index+1
+    def hash(self,block)->str:
+
+        blockInfo=json.dumps(block.toJson(),sort_keys=True).encode()
+        return hashlib.sha256(blockInfo).hexdigest()
+
+    def proofWork(self,lastProof:int)->int:
+
+        proof=0
+        while not self.validProof(lastProof,proof):
+            proof+=1
+        return proof
+
+    @staticmethod
+    def validProof(lastproof:int,proof:int)->bool:
+
+        test=f'{lastproof}{proof}'.encode()
+        hashStr=hashlib.sha256(test).hexdigest()
+        return hashStr[0:4]=="0000"
+
+    def lastBlock(self):
+
+        try:
+            obj=self.chain[-1]
+            return obj
+        except:
+            return None
